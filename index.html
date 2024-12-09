@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventi</title>
+</head>
+<body>
+    <h1>Elenco Eventi</h1>
+    <table id="eventiTable" border="1">
+        <thead>
+            <tr>
+                <th>Titolo</th>
+                <th>Data Inizio</th>
+                <th>Data Fine</th>
+                <th>Immagine</th>
+                <th>Luogo</th>
+                <th>Programma</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- I dati verranno inseriti qui -->
+        </tbody>
+    </table>
+
+    <script>
+        // Funzione per caricare il file CSV
+        function caricaCSV() {
+            fetch('raduni.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const righe = data.split('\n').map(riga => riga.split(';'));
+                    // Rimuovi righe vuote
+                    const righeFiltrate = righe.filter(riga => riga.length === 6);
+
+                    // Ottieni la data di oggi
+                    const oggi = new Date();
+
+                    // Filtra eventi che finiscono dopo oggi
+                    const eventiFuturi = righeFiltrate.filter(riga => new Date(riga[2]) >= oggi);
+
+                    // Ordina le righe in base alla data di fine (colonna 3)
+                    eventiFuturi.sort((a, b) => new Date(a[2]) - new Date(b[2]));
+
+                    const tbody = document.getElementById('eventiTable').getElementsByTagName('tbody')[0];
+
+                    eventiFuturi.forEach(colonne => {
+                        const nuovaRiga = tbody.insertRow();
+                        
+                        colonne.forEach((colonna, index) => {
+                            const nuovaColonna = nuovaRiga.insertCell();
+                            if (index === 5) { // Se è l'ultima colonna (programma)
+                                nuovaColonna.innerHTML = colonna; // Usa innerHTML per interpretare come HTML
+                            } else if (colonna.includes('images/')) { // Controlla se è un link per un'immagine
+                                const img = document.createElement('img');
+                                img.src = colonna;
+                                img.alt = 'Immagine evento';
+                                img.style.width = '100px'; // Imposta la larghezza dell'immagine
+                                nuovaColonna.appendChild(img);
+                            } else {
+                                nuovaColonna.textContent = colonna; // Usa textContent per le altre colonne
+                            }
+                        });
+                    });
+                })
+                .catch(error => console.error('Errore nel caricamento del file CSV:', error));
+        }
+
+        // Carica il CSV al caricamento della pagina
+        window.onload = caricaCSV;
+    </script>
+</body>
+</html>
