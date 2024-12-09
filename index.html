@@ -26,7 +26,7 @@
     <script>
         // Funzione per caricare il file CSV
         function caricaCSV() {
-            fetch('raduni.csv')
+            fetch('https://ppvv3.netsons.org/mark2/raduni.csv')
                 .then(response => response.text())
                 .then(data => {
                     const righe = data.split('\n').map(riga => riga.split(';'));
